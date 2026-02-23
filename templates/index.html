@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Movie Recommendation System</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background-color: #141414;
+            color: white;
+            overflow-x: hidden;
+        }
+
+        header {
+            background: linear-gradient(to bottom, rgba(0,0,0,0.9), transparent);
+            padding: 20px 50px;
+            position: fixed;
+            width: 100%;
+            z-index: 1000;
+        }
+
+        header h1 {
+            color: #e50914;
+            font-size: 28px;
+            letter-spacing: 2px;
+        }
+
+        .hero {
+            height: 80vh;
+            background: url('https://images.unsplash.com/photo-1524985069026-dd778a71c7b4') center/cover no-repeat;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .hero h2 {
+            font-size: 48px;
+            margin-bottom: 20px;
+            text-shadow: 0px 4px 20px rgba(0,0,0,0.8);
+        }
+
+        .search-container {
+            margin-top: 20px;
+        }
+
+        select {
+            padding: 12px 20px;
+            width: 300px;
+            border-radius: 5px;
+            border: none;
+            outline: none;
+            font-size: 16px;
+            margin-right: 10px;
+        }
+
+        button {
+            padding: 12px 25px;
+            background-color: #e50914;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #f6121d;
+            transform: scale(1.05);
+        }
+
+        .loading {
+            display: none;
+            margin-top: 20px;
+        }
+
+        .movies-section {
+            padding: 60px 50px;
+        }
+
+        .movies-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .movie-card {
+            background-color: #1f1f1f;
+            border-radius: 10px;
+            overflow: hidden;
+            transition: transform 0.4s ease, box-shadow 0.4s ease;
+            cursor: pointer;
+        }
+
+        .movie-card img {
+            width: 100%;
+            height: 270px;
+            object-fit: cover;
+        }
+
+        .movie-card h4 {
+            padding: 10px;
+            font-size: 14px;
+            text-align: center;
+        }
+
+        .movie-card:hover {
+            transform: scale(1.1);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.7);
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            background-color: #000;
+            font-size: 14px;
+        }
+
+        @media(max-width: 768px) {
+            .hero h2 {
+                font-size: 30px;
+            }
+
+            select {
+                width: 200px;
+                margin-bottom: 10px;
+            }
+
+            .search-container {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }
+
+            button {
+                width: 200px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Movie Recommendation System</h1>
+</header>
+
+<section class="hero">
+    <h2>Discover New Movies as per your Selection</h2>
+
+    <!-- <div class="search-container">
+        <select id="movieSelect">
+            <option value="">Select a Movie</option> -->
+            <!-- Populate dynamically -->
+            <!-- <option value="Inception">Inception</option>
+            <option value="Avatar">Avatar</option>
+            <option value="Interstellar">Interstellar</option>
+        </select>
+
+        <button onclick="getRecommendations()">Recommend</button>
+    </div> -->
+
+    <div class="search-container">
+        <select id="movieSelect">
+            <option value="">Select a Movie</option>
+            {% for movie in movie_list %}
+                <option value="{{ movie }}">{{ movie }}</option>
+            {% endfor %}
+        </select>
+
+        <button onclick="getRecommendations()">Recommend</button>
+    </div>
+
+    <div class="loading" id="loading">
+        <p>Loading recommendations...</p>
+    </div>
+</section>
+
+<section class="movies-section">
+    <h2>Recommended Movies</h2>
+    <div class="movies-grid" id="moviesGrid"></div>
+</section>
+
+<footer>
+    © 2026 Movie Recommendation System | Built by MJ with ❤️
+</footer>
+
+<script>
+    // async function getRecommendations() {
+    //     const movie = document.getElementById("movieSelect").value;
+    //     if (!movie) {
+    //         alert("Please select a movie first!");
+    //         return;
+    //     }
+
+    //     document.getElementById("loading").style.display = "block";
+    //     document.getElementById("moviesGrid").innerHTML = "";
+
+    //     try {
+    //         const response = await fetch("/recommend", {
+    //             method: "POST",
+    //             headers: {
+    //                 "Content-Type": "application/json"
+    //             },
+    //             body: JSON.stringify({ movie: movie })
+    //         });
+
+    //         const data = await response.json();
+    //         document.getElementById("loading").style.display = "none";
+
+    //         const grid = document.getElementById("moviesGrid");
+
+    //         data.forEach(movie => {
+    //             const posterURL = `https://image.tmdb.org/t/p/w500${movie.poster_path}`;
+
+    //             const card = document.createElement("div");
+    //             card.classList.add("movie-card");
+
+    //             card.innerHTML = `
+    //                 <img src="${posterURL}" alt="${movie.title}">
+    //                 <h4>${movie.title}</h4>
+    //             `;
+
+    //             grid.appendChild(card);
+    //         });
+
+    //     } catch (error) {
+    //         console.error("Error fetching recommendations:", error);
+    //         document.getElementById("loading").style.display = "none";
+    //     }
+    // }
+
+        async function getRecommendations() {
+        const movie = document.getElementById("movieSelect").value;
+
+        if (!movie) {
+            alert("Please select a movie first!");
+            return;
+        }
+
+        document.getElementById("loading").style.display = "block";
+        document.getElementById("moviesGrid").innerHTML = "";
+
+        const response = await fetch("/recommend", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ movie: movie })
+        });
+
+        const data = await response.json();
+        document.getElementById("loading").style.display = "none";
+
+        const grid = document.getElementById("moviesGrid");
+
+        data.forEach(movie => {
+            const card = document.createElement("div");
+            card.classList.add("movie-card");
+
+            card.innerHTML = `
+                <img src="${movie.poster_path}" alt="${movie.title}">
+                <h4>${movie.title}</h4>
+            `;
+
+            grid.appendChild(card);
+        });
+    }
+</script>
+
+</body>
+</html>
