@@ -66,13 +66,18 @@ def home():
 
 @app.route('/recommend', methods=['POST'])
 def recommend_api():
-    movie_name = request.json['movie']
+    movie_name = request.form.get('movie')
     recommendations = recommend(movie_name)
-    return jsonify(recommendations)
+    
+    return render_template('index.html',
+                           movie_list=movies['title'].values,
+                           recommendations=recommendations)
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    import os
+    port = int(os.environ.get("PORT", 10000))
+    app.run(host="0.0.0.0", port=port)
 # https://api.themoviedb.org/3/account/{account_id}/watchlist/movies
 
 

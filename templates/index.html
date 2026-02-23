@@ -260,8 +260,8 @@
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify({ movie: movie })
-        });
+            body: JSON.stringify({ movie: selectedMovie })
+        })
 
         const data = await response.json();
         document.getElementById("loading").style.display = "none";
