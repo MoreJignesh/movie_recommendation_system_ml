@@ -14,11 +14,11 @@ TMDB_API_KEY = os.getenv("TMDB_API_KEY")
 app = Flask(__name__)
 
 # Load movie dictionary
-movies_dict = pickle.load(open('notebook\movie_dict.pkl', 'rb'))
+movies_dict = pickle.load(open('notebook/movie_dict.pkl', 'rb'))
 movies = pd.DataFrame(movies_dict)
 
 # OPTIONAL: Load similarity matrix if you have it
-similarity = pickle.load(open('notebook\similarity.pkl', 'rb'))
+similarity = pickle.load(open('notebook/similarity.pkl', 'rb'))
 
 # Fetch poster from TMDB
 def fetch_poster(movie_id):
