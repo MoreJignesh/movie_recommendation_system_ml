@@ -22,10 +22,14 @@ similarity = pickle.load(open('notebook/similarity.pkl', 'rb'))
 
 # Fetch poster from TMDB
 def fetch_poster(movie_id):
+    if not TMDB_API_KEY:
+        return ""
+
     url = f"https://api.themoviedb.org/3/movie/{movie_id}?api_key={TMDB_API_KEY}&language=en-US"
     response = requests.get(url)
     data = response.json()
-    return "https://image.tmdb.org/t/p/w500/" + data['poster_path']
+
+    return "https://image.tmdb.org/t/p/w500/" + data.get('poster_path', "")
 
 
 # Recommendation logic
@@ -66,12 +70,19 @@ def home():
 
 @app.route('/recommend', methods=['POST'])
 def recommend_api():
-    movie_name = request.form.get('movie')
-    recommendations = recommend(movie_name)
+    data = request.get_json()
     
-    return render_template('index.html',
-                           movie_list=movies['title'].values,
-                           recommendations=recommendations)
+    if not data:
+        return jsonify({"error": "No JSON received"}), 400
+
+    movie_name = data.get('movie')
+
+    if not movie_name:
+        return jsonify({"error": "Movie not provided"}), 400
+
+    recommendations = recommend(movie_name)
+
+    return jsonify(recommendations)
 
 
 if __name__ == "__main__":
